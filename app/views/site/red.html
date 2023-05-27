@@ -1,0 +1,667 @@
+{% extends "site/master.html" %} {% block content %}
+
+<style>
+  .shelf-item__list-price,
+  .shelf-item__best-price {
+    color: #000;
+    display: inline !important;
+  }
+
+  .de {
+    font-size: 16px;
+    color: #000;
+  }
+
+  .por {
+    font-size: 20px;
+    font-weight: 700;
+    color: #000;
+  }
+
+  .por .shelf-item__best-price {
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .btn-fixe {
+    width: 70px;
+    height: 70px;
+    background-color: yellow;
+    border-radius: 45px;
+    position: absolute;
+    color: #000;
+    top: -25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 118px;
+    font-weight: 700;
+    transition: all ease-in-out 0.1s;
+  }
+
+
+
+  .btn-fixe:after {
+    content: "+";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    font-size: 88px;
+    font-weight: 700;
+
+  }
+
+  .btn-fixe:hover {
+    cursor: pointer;
+    background-color: green;
+    color: #fff;
+  }
+
+  #match-list {
+    height: 450px;
+    overflow: auto;
+    overflow-x: hidden;
+  }
+
+  .lds-hourglass {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+  }
+
+  .lds-hourglass:after {
+    content: " ";
+    display: block;
+    border-radius: 50%;
+    width: 0;
+    height: 0;
+    margin: 8px;
+    box-sizing: border-box;
+    border: 32px solid #000;
+    border-color: #000 transparent #000 transparent;
+    animation: lds-hourglass 1.2s infinite;
+  }
+
+  @keyframes lds-hourglass {
+    0% {
+      transform: rotate(0);
+      animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+    }
+
+    50% {
+      transform: rotate(900deg);
+      animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+
+    100% {
+      transform: rotate(1800deg);
+    }
+  }
+
+  body.loader .lds-hourglass {
+    display: block;
+    pointer-events: none;
+  }
+
+  .lds-hourglass {
+    display: none;
+  }
+
+  article {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    float: left;
+    border: 1px solid #881;
+    box-sizing: border-box;
+  }
+
+  article div {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 25px;
+    transition: .5s ease;
+  }
+
+
+  article input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    background-color: #881;
+  }
+
+  input[type=checkbox]:checked~div {
+    background-color: #881;
+  }
+
+  input[type=checkbox]:checked~div span {
+    color: #fff;
+  }
+
+  article input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    background-color: #881;
+  }
+
+  input[type=checkbox]:checked~div {
+    background-color: #881;
+  }
+
+  input[type=checkbox]:checked~div span {
+    color: #fff;
+  }
+
+  #form1 .loading_bg {
+    display: none;
+
+  }
+
+  #form1.loader .loading_bg {
+    display: block;
+  }
+
+  .spinner {
+    display: none;
+  }
+
+  #loading_json.loader .spinner {
+    display: block;
+  }
+
+  #loading_json.loader {
+    display: inline-block;
+  }
+
+</style>
+
+<section class="uk-container uk-margin-medium-bottom" uk-height-viewport="expand: true">
+
+  <div class="uk-width-1-1">
+
+    <div uk-navbar>
+      <div class="uk-margin-right">
+        <a class="uk-button uk-button-primary" id="atualizar_json">
+          Atualizar Json da Manole
+        </a>
+      </div>
+      <div id="loading_json">
+        <span class="spinner" uk-spinner></span>
+      </div>
+    </div>
+    <p>Json foi atualizado <span id="json_date">{{json_date}}</span></p>
+
+
+    <div class="uk-margin-large">
+      <div class="uk-child-width-1-2@s" uk-grid>
+
+        <div>
+          <!-- 
+          {% for produto in produtos %}
+          <div class="produto" id="produto_{{ loop.index }}">
+             
+
+            <div class="uk-card uk-card-default  uk-margin" uk-grid>
+              <div class="uk-width-1-3@s uk-flex uk-flex-middle">
+                <img src="{{produto.1|raw}}" alt="">
+                <canvas width="600" height="400"></canvas>
+              </div>
+              <div class="uk-width-2-3@s">
+                <div class="uk-card-body">
+                  <h3 class="uk-card-title" data_name="{{produto.3|raw}}">
+                    {{produto.3|raw}}
+                  </h3>
+                  <div class="de">
+                    De <strike>{{produto.4|raw}}</strike>
+                  </div>
+                  <div class="por">
+                    Por <strong>{{produto.5|raw}}</strong>
+                  </div>
+                  <a class="link" href="{{produto.2|raw}}" alt="">
+                    {{produto.2|raw}}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+          -->
+          <aside class="uk-width-expand produto uk-margin-large-bottom">
+            <form class="uk-search uk-search-default uk-width-1-1">
+              <input class="uk-search-input" type="search" placeholder="Search" id="search">
+            </form>
+          </aside>
+
+          <div class="uk-flex uk-flex-center">
+            <div class="lds-hourglass"></div>
+          </div>
+          <div id="match-list"> </div>
+        </div>
+
+        <div>
+          <div uk-grid class="uk-child-width-expand">
+            <div>
+              <article>
+                <input type="checkbox" style="font-size: 11px;" id="desconto" />
+                <div>
+                  <span>
+                    Esconder Preço
+                  </span>
+                </div>
+              </article>
+            </div>
+
+
+            <button class="uk-button uk-button-secondary " style="font-size: 11px;" id="apagar">Remover ultimo
+              item</button>
+            <button class="uk-button  " id="baixar" style="font-size: 11px;">Baixar html</button>
+          </div>
+
+          <div id="email">
+            <table class="email" align="center" bgcolor="ea0026"
+              style="border-collapse:collapse;padding-top:15px;padding-bottom:15px;" width="600" height="" border="0"
+              cellpadding="0" cellspacing="0">
+              <tr>
+                <td height="15"></td>
+              </tr>
+              <tr>
+                <td>
+                  <table align="center" style="border-collapse:collapse;" width="560" id="galeria">
+
+                  </table>
+                </td>
+              </tr>
+
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+
+  </div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js"
+  integrity="sha512-u9akINsQsAkG9xjc1cnGF4zw5TFDwkxuc9vUp5dltDWYCSmyd0meygbvgXrlc/z7/o4a19Fb5V0OUE58J7dcyw=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+
+
+  const url_enviarImagem = "http://localhost/slim4-php-scraper/public/gravarImagem";
+
+  const url = "http://localhost/slim4-php-scraper/public/json";
+
+  document.getElementById('atualizar_json').addEventListener("click", function () {
+
+    document.getElementById('loading_json').classList.add('loader');
+    document.getElementById('atualizar_json').disabled = true;
+
+
+    axios({
+      method: 'get',
+      url: url,
+
+    }).then(
+      response => {
+        console.log(response.data);
+        document.getElementById('loading_json').classList.remove('loader');
+        Swal.fire({
+          icon: 'success',
+          title: 'Json!',
+          text: 'Atualizado um sucesso'
+        }
+        );
+        document.getElementById('atualizar_json').disabled = false;
+        document.getElementById('json_date').innerHTML = response.data.data;
+      }
+    ).catch(function (error) {
+      console.log(error);
+      document.getElementById('loading_json').classList.remove('loader');
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Ocorreu um erro ao atualizar'
+      })
+    });
+  });
+
+
+  const search = document.getElementById('search');
+  const matchList = document.getElementById('match-list');
+  const table = document.querySelector('#galeria');
+  const apagar = document.querySelector('#apagar');
+  const baixar = document.getElementById('baixar');
+  const email = document.getElementById('email');
+  const body = document.querySelector('body');
+
+
+
+  baixar.addEventListener("click", function (e) {
+    var link_download = document.createElement("a");
+    link_download.setAttribute("href", "data:text/html," + encodeURIComponent(email.innerHTML));
+    link_download.setAttribute("download", 'email_final' + '.html');
+    link_download.click();
+  });
+
+
+
+
+  //procura no json e filtra eles
+
+  const searchStates = async searchText => {
+    body.classList.add('loader');
+
+    const res = await fetch("{{ base_path }}/JSON_MANOLE.json");
+
+    const states = await res.json();
+
+    //faz o match entre o texto teclado e o json
+
+    let matches = states.filter(state => {
+      const regex = new RegExp(`${searchText}`, 'gi');
+
+      return state.nome.match(regex) || state.skul.match(regex) || state.link.match(regex);
+
+    });
+
+    if (searchText.length === 0) {
+      matches = [];
+
+      matchList.innerHTML = "";
+    }
+
+    outputHtml(matches);
+    console.log(matches);
+  };
+
+
+  const outputHtml = matches => {
+
+    body.classList.remove('loader');
+
+    if (matches.length > 0) {
+
+      const html = matches.map(match =>
+        ` 
+        <div class="produto uk-margin-large uk-position-relative">
+    <div class="btn-fixe"><span uk-icon="icon: lifesaver; ratio: 2"></span></div>
+    <a alt="${match.categoria}" class="link" href="#" style="text-decoration: none; width: 580px; display: block;" title="${match.link}"></a>
+    <table border="0" cellpadding="0" cellspacing="0" height="" width="580">
+        <tr>
+            <td height="" width="42">
+                <tr>
+                    <td align="center" height="" style="display: block; border: none; width: 183px; height: 183px;" valign="middle" width="183">
+                        <img alt="${match.nome}" class="img" src="${match.img}" style="display: block; border: none; width: 183px; height: 183px;" />
+                    </td>
+                    <td height="" width="43"></td>
+                    <td colspan="3" height="" width="272">
+                        <table border="0" cellpadding="0" cellspacing="0" height="152" width="265">
+                            <tr>
+                                <td align="center" height="34" valign="middle" width="254">
+                                <div>
+                                  <span
+                                        class="skul"
+                                        style="font-weight: bold; color: red; font-size: 9px; line-height: 110%; text-align: left; font-family: Helvetica; padding: 20px 2px; text-decoration: none; text-transform: uppercase;"
+                                    >
+                                        ${match.skul}
+                                    </span>
+                                    <span
+                                        class="categoria"
+                                        style="margin-left:35px;font-weight: bold; color: red; font-size: 9px; line-height: 110%; text-align: left; font-family: Helvetica; padding: 20px 2px; text-decoration: none; text-transform: uppercase;"
+                                    >
+                                        ${match.categoria}
+                                    </span>
+                                    <span
+                                        class="porcentagem"
+                                        style="margin-left:35px;font-weight: bold; color: red; font-size: 9px; line-height: 110%; text-align: left; font-family: Helvetica; padding: 20px 2px; text-decoration: none; text-transform: uppercase;"
+                                    >
+                                        ${match.desconto}
+                                    </span>
+                                    </div>
+                                    <div
+                                        class="nome"
+                                        style="font-weight: bold; color: #000; font-size: 13px; line-height: 110%; text-align: center; font-family: Helvetica; padding: 2px 2px; text-decoration: none; text-transform: uppercase;"
+                                    >
+                                        ${match.nome}
+                                    </div>
+                                    <div class="de">De: ${match.de}</div>
+                                    <div class="por">Por: ${match.por}</div>
+                                    <div style="color:#000;font-size: 12px;line-height:110%;font-weight:900;font-family: Helvetica;padding: 2px 2px;text-decoration: none;margin:5px 0px;">Até <span class="parcela" style="color:red;font-size: 14px;line-height:110%;font-weight:900;font-family: Helvetica;">${match.parcela}</span> de <span class="valor_parcela" style="color:red;font-size: 14px;line-height:110%;font-weight:900;font-family: Helvetica;">${match.valor_parcela}</span> <strong style="font-weight:700">sem juros<strong></div>
+                                    <tr>
+                                        <td height="40" valign="middle" width="254">
+                                            <div
+                                                style="
+                                                    color: #000;
+                                                    font-size: 20px;
+                                                    text-align: center;
+                                                    font-family: Helvetica;
+                                                    text-decoration: none;
+                                                    margin: 5px 0px;
+                                                    font-weight: 800;
+                                                    letter-spacing: 0px;
+                                                    padding: 12px 0px;
+                                                    background: #ff0041;
+                                                    border-radius: 40px;
+                                                "
+                                            >
+                                                COMPRAR!
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td height="" width="49"></td>
+                </tr>
+            </td>
+        </tr>
+    </table>
+</div>
+
+        `).join('');
+
+      console.log(html);
+      matchList.innerHTML = html;
+
+      let produtos = document.querySelectorAll('.produto');
+
+      for (let i = 0; i < produtos.length; i++) {
+
+        produtos[i].addEventListener('click', function (e) {
+
+          let nome = this.querySelector(".nome");
+          let link = this.querySelector(".link");
+          let de = this.querySelector(".de");
+          let por = this.querySelector(".por");
+          let imagem = this.querySelector(".img");
+          let parcela = this.querySelector(".parcela");
+          let promocao = this.querySelector(".promocao");
+          let valor_parcela = this.querySelector(".valor_parcela");
+          let porcentagem = this.querySelector(".porcentagem");
+
+          limite = document.querySelector('#galeria').childElementCount;
+          let desconto = document.querySelector('#desconto');
+          limite = limite - 1;
+
+          if (desconto.checked) {
+            if (limite % 2 != 0) {
+              table.innerHTML +=
+                `<tr>
+              <td>
+             
+                <a style="text-decoration: none;margin:5px 0px; width: 580px; margin-top: 25px;margin-bottom: 35px;display: block;" href="` + '$' + `{PropertyChangeLink('${link.title}', 'interesse_navegacao', '${link.getAttribute("alt")}')}" title="${nome.textContent}" target="_blank">
+                  <table width="580" height="" border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td width="42" height="186"> </td>
+                      <td width="183" height="186" style="display:block;border:none; width:183px; height:183px;" align="center" valign="middle">
+                        <img style="display:block;border:none; width:183px; height:183px;" src="${imagem.src}" alt="${nome.textContent} "> 
+                      </td>
+                      <td width="43" height="186"> </td>
+                      <td colspan="3" width="272" height="186">
+                        <table width="265" height="152" border="0" cellpadding="0" cellspacing="0"> 
+                          <tr>
+                            <td align="center" valign="middle" width="264" height="34">
+                              <div data="name" style="font-weight:bold;color:#fff;font-size: 13px;line-height:110%;text-align: center;font-family: Helvetica;padding: 2px 2px;text-decoration: none;margin:5px 0px;text-transform: uppercase;">
+                                ${nome.textContent}</div>  
+                          </td>
+                        </tr>
+                        <tr>
+                          <td width="264" height="40" valign="middle">
+                          <div style="color:#fff;font-size:20px;text-align: center;font-family: Helvetica;text-decoration: none;margin:5px 0px;font-weight:800;letter-spacing: 0px;padding: 12px 0px;background: #1a2265;border-radius: 40px;">COMPRAR</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td width="49" height="186"> </td>
+                </tr>
+              </table>
+            </a>
+          </td>
+        </tr>`
+                ;
+            } else {
+              table.innerHTML +=
+                `<tr> 
+              <td>
+                <a style="text-decoration: none;margin:5px 0px; width: 580px;margin-top: 25px;margin-bottom: 35px;display: block;" href="` + '$' + `{PropertyChangeLink('${link.title}', 'interesse_navegacao', '${link.getAttribute("alt")}')}" title="${nome.textContent}" target="_blank">
+                  <table width="580" height="" border="0" cellpadding="0" cellspacing="0">
+                    <td width="42" height="186"> </td>
+                    <td colspan="3" width="272" height="186"> 
+                      <table width="272" height="152" border="0" cellpadding="0" cellspacing="0"> <tr>
+                        <td align="center" valign="middle" width="264" height="34">
+                           <div data="name" style="font-weight:bold;color:#fff;font-size: 13px;line-height:110%;text-align: center;font-family: Helvetica;padding: 2px 2px;text-decoration: none;margin:5px 0px;text-transform: uppercase;">${nome.textContent}</div>
+                         
+                       </td>
+                    </tr>
+                    <tr>
+                      <td width="264" height="40" valign="middle">
+                        <div style="color:#fff;font-size:20px;text-align: center;font-family: Helvetica;text-decoration: none;margin:5px 0px;font-weight:800;letter-spacing: 0px;padding: 12px 0px;background: #1a2265;border-radius: 40px;">COMPRAR</div>
+                      </td>
+                    </tr>
+                  </table>
+                    </td>
+                    <td width="43" height="186"> </td><td width="183" height="186" style="display:block;border:none; width:183px; height:183px;" align="center" valign="middle">
+                      <img style="display:block;border:none; width:183px; height:183px;" src="${imagem.src}" alt="${nome.textContent}"> </td><td width="49" height="186"> 
+                      </td>
+                    </table>
+                  </a>
+                </td>
+              </tr>`
+                ;
+            }
+          } else {
+            if (limite % 2 != 0) {
+              table.innerHTML +=
+                `<tr>
+              <td>
+             
+                <a style="text-decoration: none;margin:5px 0px; width: 580px; margin-top: 25px;margin-bottom: 35px;display: block;" href="` + '$' + `{PropertyChangeLink('${link.title}', 'interesse_navegacao', '${link.getAttribute("alt")}')}" title="${nome.textContent}" target="_blank">
+                  <table style="position:relative" width="580" height="" border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td width="43" height="186" valign="middle"> </td>
+                    <td width="183" height="186" style="display:block;border:none;" align="center" valign="middle">
+                      <img style="margin-top:10px;display:block;border:none; width:200px; height:200px;" src="${imagem.src}" alt="${nome.textContent}">  
+                    </td>
+                    <td width="49" height="156"></td>
+                      <td colspan="3" width="272" height="186">
+                        <table width="265" height="152" border="0" cellpadding="0" cellspacing="0"> 
+                          <tr>
+                            <td  valign="middle" width="264" height="34">
+                         <div data="name" style="font-weight:bold;color:#fff;font-size: 13px;line-height:110%;text-align: center;font-family: Helvetica;padding: 2px 2px;text-decoration: none;margin:5px 0px;text-transform: uppercase;">
+                                ${nome.textContent}</div> 
+                                <div style="color:#fff;font-size: 14px;text-align: center;line-height:110%;font-family: Helvetica;padding: 2px 2px;text-decoration: none;margin:5px 0px;text-decoration: line-through;">${de.textContent}</div>
+                                <div style="color:#fff;font-size: 17px;text-align: center;line-height:110%;font-weight:900;font-family: Helvetica;padding: 2px 2px;text-decoration: none;margin:5px 0px;">${por.textContent}</div>
+                               
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td width="264" height="40" valign="middle">
+                          <div style="color:#fff;font-size:20px;text-align:center;font-family: Helvetica;text-decoration: none;margin:5px 0px;font-weight:800;letter-spacing: 0px;padding: 12px 0px;background: #1a2265;border-radius: 40px;">COMPRAR</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td width="49" height="186"> </td>
+                </tr>
+              </table>
+            </a>
+          </td>
+        </tr>`
+                ;
+            } else {
+              table.innerHTML +=
+                `<tr> 
+              <td>
+                <a style="text-decoration: none;margin:5px 0px; width: 580px;margin-top: 25px;margin-bottom: 35px;display: block;" href="` + '$' + `{PropertyChangeLink('${link.title}', 'interesse_navegacao', '${link.getAttribute("alt")}')}" title="${nome.textContent}" target="_blank">
+                  <table style="position:relative" width="580" height="" border="0" cellpadding="0" cellspacing="0">
+                    <td width="42" height="186"> </td>
+                    <td colspan="3" width="272" height="186"> 
+                      <table  width="272" height="152" border="0" cellpadding="0" cellspacing="0"> <tr>
+                        <td align="right" valign="middle" width="264" height="34">
+                         <div data="name" style="font-weight:bold;color:#fff;font-size: 13px;text-align: center;line-height:110%;text-align: center;font-family: Helvetica;padding: 2px 2px;text-decoration: none;margin:5px 0px;text-transform: uppercase;">${nome.textContent}</div>
+                          <div style="color:#fff;font-size: 14px;line-height:110%;text-align: center;font-family: Helvetica;padding: 2px 2px;text-decoration: none;margin:5px 0px;text-decoration: line-through;">${de.textContent}</div>
+                          <div style="color:#fff;font-size: 17px;line-height:110%;text-align: center;font-weight:900;font-family: Helvetica;padding: 2px 2px;text-decoration: none;margin:5px 0px;">${por.textContent}</div> 
+                          
+                      </td>
+                    </tr>
+                    <tr>
+                      <td width="264" height="40" valign="middle">
+                        <div style="color:#fff;font-size:20px;text-align: center;font-family: Helvetica;text-decoration: none;margin:5px 0px;font-weight:800;letter-spacing: 0px;padding: 12px 0px;background: #1a2265;border-radius: 40px;">COMPRAR</div>
+                      </td>
+                    </tr>
+                  </table>
+                    </td>
+                    <td width="43" height="186" valign="middle"> </td>
+                    <td width="183" height="186" style="display:block;border:none;" align="center" valign="middle">
+                      <img style="margin-top:10px;display:block;border:none; width:200px; height:200px;" src="${imagem.src}" alt="${nome.textContent}">
+                    </td>
+                    <td width="49" height="156"></td>
+                    </table>
+                  </a>
+                </td>
+              </tr>`
+                ;
+            }
+
+          }
+
+        }, false);
+      }
+    };
+
+  };
+
+  search.addEventListener('input', () => searchStates(search.value)); // Ele reage ao envento de qualque input dentro do campo search. Cada input vai formando um Array de caracteres para dentro do e depois ele manda isso para fazer a busca no searchStates
+
+
+  apagar.addEventListener('click', function (e) {
+    table.removeChild(table.lastElementChild);
+  }, false);
+
+
+
+
+</script>
+{% endblock %}

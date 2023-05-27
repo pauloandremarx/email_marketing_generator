@@ -1,0 +1,23 @@
+{% extends "site/master.html" %} {% block content %}
+
+<section class="uk-container uk-margin-medium-bottom" uk-height-viewport="expand: true">
+  <p class="uk-margin-medium-top uk-margin-medium-bottom">Caminho: <b class="uk-text-bold">{{ base_path }}</b></p>
+  <div class="uk-width-1-1">
+    <h1 class="uk-heading-line uk-text-center uk-margin-large-bottom"><span>Login</span></h1>
+
+    {% if logged_in %} Você já está logado {% else %}
+    <form class="uk-form-stacked" action="{{ base_path }}/login" method="post">
+      <input type="text" name="email" class="uk-input uk-margin" value="admin@gmail.com" placeholder="seu email" />
+      {{ messages['email']['message']|message(messages['email']['alert'])|raw }}
+      <br />
+      <input type="password" name="password" class="uk-input uk-margin" value="123" placeholder="sua senha" />
+      {{ messages['password']['message']|message(messages['password']['alert'])|raw
+    }}
+
+      <button type="submit" class="uk-width-1-1 uk-button uk-margin" id="btn-create">Logar</button>
+    </form>
+  </div>
+</section>
+
+
+{% endif %} {% endblock %}

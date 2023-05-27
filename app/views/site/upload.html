@@ -1,0 +1,28 @@
+{% extends "site/master.html" %} {% block content %}
+
+<section class="uk-container uk-margin-medium-bottom" uk-height-viewport="expand: true">
+
+    <p class="uk-margin-medium-top uk-margin-medium-bottom">Caminho: <b class="uk-text-bold">{{ base_path }}</b></p>
+    <div class="uk-width-1-1">
+        <h1 class="uk-heading-line uk-text-center uk-margin-large-top uk-margin-large-bottom">
+            <span>Usuários</span>
+        </h1>
+    </div>
+
+    <div class="uk-width-1-1">
+        {{ messages['message']['message']|message( messages['message']['alert'])|raw }}
+        <form action="{{ base_path }}/doupload" method="post" enctype="multipart/form-data">
+            {{ messages['file']['message']|message( messages['file']['alert'])|raw }}
+            <input type="file" name="file" value="{{ messages['Post_file']['message']|raw}}">
+
+            <br>
+
+            <button class="btn btn-success">Upload</button>
+        </form>
+
+    </div>
+
+</section>
+
+
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "site/master.html" %} {% block content %}
+
+<section class="uk-container uk-margin-medium-bottom" uk-height-viewport="expand: true">
+
+  <p class="uk-margin-medium-top uk-margin-medium-bottom">Caminho: <b class="uk-text-bold">{{ base_path }}</b></p>
+  <div class="uk-width-1-1">
+    <h1 class="uk-heading-line uk-text-center uk-margin-large-top uk-margin-large-bottom">
+      <span>Usuários</span>
+    </h1>
+
+    {{ messages['message']['message']|message( messages['message']['alert'])|raw }}
+
+    <form action="{{ base_path }}/user/store" method="post">
+      <input type="hidden" name="{{ csrf.nameKey }}" value="{{ csrf.name }}">
+      <input type="hidden" name="{{ csrf.valueKey }}" value="{{ csrf.value }}">
+
+      <label for="name">Nome:</label>
+      {{ messages['name']['message']|message( messages['name']['alert'])|raw }}
+      <input type="text" name="name" class="uk-input uk-margin" value="{{ messages['Post_name']['message']|raw}}" />
+
+
+      <label for="email">E-mail:</label>
+      {{ messages['email']['message']|message( messages['email']['alert'])|raw }}
+      <input type="text" name="email" class="uk-input uk-margin" value="{{ messages['Post_email']['message']|raw}}" />
+
+
+      <label for="password">Senha:</label>
+      {{ messages['password']['message']|message( messages['password']['alert'])|raw}}
+      <input type="password" name="password" class="uk-input uk-margin"
+        value="{{ messages['Post_password']['message']|raw }}" />
+
+
+      <button class="uk-button uk-button-default uk-width-1-1" type="submit">Cadastrar</button>
+    </form>
+</section>
+{% endblock %}

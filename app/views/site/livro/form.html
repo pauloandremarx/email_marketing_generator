@@ -1,0 +1,132 @@
+{% extends "site/master.html" %} {% block content %}
+
+<section class="uk-container uk-margin-medium-bottom" uk-height-viewport="expand: true">
+
+  <p class="uk-margin-medium-top uk-margin-medium-bottom">Caminho: <b class="uk-text-bold">{{ base_path }}</b></p>
+  <div class="uk-width-1-1">
+    <h1 class="uk-heading-line uk-text-center uk-margin-large-top uk-margin-large-bottom">
+      <span>{{title}}</span>
+    </h1>
+
+    {% if messages['message']['message'] %}
+    <div class="uk-margin">
+      <p>{{ messages['message']['message'] }}</p>
+    </div>
+    {% endif %}
+
+
+    <form {% if livro %}action="{{ base_path }}/livro/update/{{ livro.id }}"
+      {% else %}action="{{ base_path }}/livro/store" {% endif %} method="post" enctype="multipart/form-data"
+      class="validate-me" id="validate-me" data-validate>
+
+
+      {% if livro %}<input type="hidden" name="_METHOD" value="PUT" />{% endif %}
+
+      <label for="genero">Nome:</label>
+      {{ messages['nome']['message']|message( messages['nome']['alert'])|raw }}
+      <input type="text" name="nome" class="uk-input uk-margin"
+        value="{% if livro %}{{ livro.nome }}{% else %}{{ messages['Post_nome']['message']|raw}}{% endif %}" required />
+
+
+      <label for="genero">Genero:</label>
+      {{ messages['genero']['message']|message( messages['genero']['alert'])|raw }}
+      <input type="text" name="genero" class="uk-input uk-margin"
+        value="{% if livro %}{{ livro.genero }}{% else %}{{ messages['Post_genero']['message']|raw}}{% endif %}"
+        required />
+
+      <div class="uk-margin" uk-margin>
+        <label for="capa">Capa:</label>
+        {{ messages['capa']['message']|message( messages['capa']['alert'])|raw}}
+        <p class="title_form">Selecione a imagem. Recomendado de 526px x 469px:</p>
+        <!-- novo elemento! -->
+        <div uk-form-custom>
+
+          <input type="file" id="capa" type="file" accept="image/*" maxlength="400" name="capa"
+            value="{% if livro %}{{ livro.capa }}{% else %}{{ messages['Post_capa']['message']|raw }}{% endif %}"
+            data-bouncer-target="#file-error-msg" required>
+          <button class="uk-button uk-button-default" type="button" tabindex="-1">Selecione a imagem
+            {{ messages['Post_capa']['message']|raw }}</button>
+          <div id="file-error-msg"></div>
+        </div>
+        <!-- invisível -->
+        <div class="uk-box"><img width="150" id="preview-capa" {% if livro %}src="{{ base_path }}/{{  livro.capa }}"
+            {% endif %} /></div>
+      </div>
+
+      <label for="preco">Preço:</label>
+      {{ messages['preco']['message']|message( messages['preco']['alert'])|raw}}
+      <input type="text" name="preco" class="uk-input uk-margin"
+        value="{% if livro %}{{ livro.preco }}{% else %}{{ messages['Post_preco']['message']|raw }}{% endif %}"
+        required />
+
+
+      <input class="uk-button uk-button-default uk-width-1-1" type="submit"
+        value="   {% if livro %}Atualizar{% else %}Cadastrar {% endif %}">
+
+
+    </form>
+</section>
+
+<script src="{{ base_path }}/assets/js/bouncer.polyfills.min.js"></script>
+
+<script>
+
+  var bouncer = new Bouncer('[data-validate]', {
+    disableSubmit: false,
+    customValidations: {
+      valueMismatch: function (field) {
+
+        // Look for a selector for a field to compare
+        // If there isn't one, return false (no error)
+        var selector = field.getAttribute('data-bouncer-match');
+        if (!selector) return false;
+
+        // Get the field to compare
+        var otherField = field.form.querySelector(selector);
+        if (!otherField) return false;
+
+        // Compare the two field values
+        // We use a negative comparison here because if they do match, the field validates
+        // We want to return true for failures, which can be confusing
+        return otherField.value !== field.value;
+
+      }
+    },
+    messages: {
+      valueMismatch: function (field) {
+        var customMessage = field.getAttribute('data-bouncer-mismatch-message');
+        return customMessage ? customMessage : 'Certifique-se de que os campos correspondem.'
+      }
+    }
+  });
+
+  document.addEventListener('bouncerFormInvalid', function (event) {
+    console.log(event.detail.errors);
+    console.log(event.detail.errors[0].offsetTop);
+    window.scrollTo(0, event.detail.errors[0].offsetTop);
+  }, false);
+
+
+
+
+  document.getElementById("capa").onchange = function () {
+
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      // get loaded data and render thumbnail.
+      document.getElementById("preview-capa").src = e.target.result;
+      var previewImg = document.getElementById("preview-capa");
+      var lembrar_img = previewImg;
+      localStorage.setItem('b64Data', e.target.result);
+
+    };
+    // read the image file as a data URL.
+    reader.readAsDataURL(this.files[0]);
+  };
+
+
+
+
+</script>
+
+{% endblock %}

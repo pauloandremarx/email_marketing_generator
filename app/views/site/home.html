@@ -1,0 +1,155 @@
+{% extends "site/master.html" %} {% block content %}
+
+
+<section class="uk-container">
+
+  <div class="uk-width-1-1 height-lista uk-flex uk-flex-middle">
+    <aside class="uk-width-1-1 ">
+
+      <form action="{{ base_path }}/api_produto_manole" method="post">
+        <input type="text" required class="input_produto" id="list_product" name="penis"
+          placeholder="Digite a URL de produtos da Manole" value="https://www.manole.com.br/cursos#1" />
+
+
+      </form>
+
+      <div class="">
+        <a class="btn_complete" id="atualizar_json">
+          Atualizar lista de produtos!
+        </a>
+      </div>
+
+      <div id="loading_json">
+        <span class="spinner" uk-spinner></span>
+      </div>
+
+    </aside>
+  </div>
+
+
+
+  <div id="json_date"></div>
+</section>
+
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+  integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+
+  document.getElementById('atualizar_json').addEventListener("click", function () {
+
+    document.getElementById('atualizar_json').disabled = false;
+
+    const url_final = '{{ base_path }}/api_produto_manole';
+
+
+
+    var request = $.ajax({
+      url: url_final,
+      type: "POST",
+      data: { url: document.getElementById('list_product').value },
+      dataType: "json"
+    });
+
+    document.getElementById('loading_json').classList.add('loader');
+
+
+    request.done(function (msg) {
+
+      document.getElementById('loading_json').classList.remove('loader');
+
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Json!',
+        text: 'Atualizado um sucesso'
+      });
+
+      document.getElementById('json_date').innerHTML = "";
+
+      var newcontent = document.createElement('h1');
+      newcontent.innerHTML = "<h1>Produtos Adicionados e Duplicatas Removidos</h1>";
+
+      document.getElementById('json_date').appendChild(newcontent.firstChild);
+
+      var json_resultado = document.createElement('div');
+
+
+      json_resultado.innerHTML = msg.map(product => product.nome + '<br>');
+      document.getElementById('json_date').appendChild(json_resultado);
+
+    });
+
+    request.fail(function (jqXHR, textStatus) {
+
+      Swal.fire({
+        icon: 'Request error',
+        title: 'Oops...',
+        text: textStatus
+      })
+
+
+    });
+
+  });
+
+
+  /*
+    document.getElementById('atualizar_json').addEventListener("click", function () {
+  
+      const url_final = '{{ base_path }}/api_produto_manole';
+      document.getElementById('loading_json').classList.add('loader');
+  
+  
+  
+      axios({
+        method: 'POST',
+        url: url_final,
+        penis: "https://www.manole.com.br/liberda?O=OrderByTopSaleDESC#1",
+  
+  
+      }).then(
+        response => {
+          console.log(response.data);
+          document.getElementById('loading_json').classList.remove('loader');
+          Swal.fire({
+            icon: 'success',
+            title: 'Json!',
+            text: 'Atualizado um sucesso'
+          }
+          );
+          document.getElementById('atualizar_json').disabled = false;
+  
+  
+          var newcontent = document.createElement('h1');
+          newcontent.innerHTML = "<h1>Produtos Adicionados e Duplicatas Removidos</h1>";
+  
+          document.getElementById('json_date').appendChild(newcontent.firstChild);
+  
+          var json_resultado = document.createElement('div');
+          json_resultado.innerHTML = response.data.map(product => product.nome + '<br>');
+          document.getElementById('json_date').appendChild(json_resultado);
+  
+        }
+      ).catch(function (error) {
+        console.log(error);
+        document.getElementById('loading_json').classList.remove('loader');
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Ocorreu um erro ao atualizar'
+        })
+      });
+    });
+  */
+
+
+</script>
+{% endblock %}

@@ -1,0 +1,26 @@
+{
+  "require": {
+    "slim/slim": "^4.5",
+    "slim/twig-view": "^3.1",
+    "slim/psr7": "^1.2",
+    "php-di/php-di": "^6.2",
+    "slim/http-cache": "^1.0",
+    "slim/csrf": "^1.0",
+    "intervention/image": "^2.4",
+    "filp/whoops": "^2.14",
+    "maennchen/zipstream-php": "^2.2",
+    "nyholm/psr7-server": "^1.0",
+    "sentry/sentry-symfony": "^4.3",
+    "nyholm/psr7": "^1.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "app\\": "app"
+    },
+    "files": [
+      "app/helpers/config.php",
+      "app/helpers/redirect.php",
+      "app/helpers/twig_variables.php"
+    ]
+  }
+}

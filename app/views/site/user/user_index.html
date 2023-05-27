@@ -1,0 +1,34 @@
+{% extends "site/master.html" %} {% block content %}
+
+<section class="uk-container uk-margin-medium-bottom" uk-height-viewport="expand: true">
+  <p class="uk-margin-medium-top uk-margin-medium-bottom">Caminho: <b class="uk-text-bold">{{ base_path }}</b></p>
+  <div class="uk-width-1-1">
+    <h1 class="uk-heading-line uk-text-center uk-margin-large-top uk-margin-large-bottom">
+      <span>Usuários</span>
+    </h1>
+    <a href="{{ base_path }}/user/create"
+      class="uk-width-1-1 uk-button uk-button-default uk-margin-large-bottom">Criar</a>
+
+    <div class="uk-child-width-1-3@m uk-grid-small uk-grid-match" uk-grid>
+      {% for user in users %}
+      <div>
+        <div class="uk-card uk-card-default uk-card-body">
+          <h3 class="uk-card-title"> {{user.name }}</h3>
+          <p>{{user.email }}</p>
+
+          <div class="uk-flex uk-flex-between">
+            <a href="{{ base_path }}/user/edit/{{ user.id }}" class="uk-button uk-button-default">Editar</a>
+
+            <form action="{{ base_path }}/user/delete/{{ user.id }}" method="post">
+              <input type="hidden" name="_METHOD" value="DELETE" />
+              <button type="submit" class="uk-button uk-button-danger">Deletar</button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+      {% endfor %}
+    </div>
+
+</section>
+{% endblock %}
