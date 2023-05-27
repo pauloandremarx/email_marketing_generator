@@ -1,4 +1,4 @@
-# Curso de Slim Framework 4 - Componentes
+# Generator de E-mail-Marketing Manole PHP com Intervention Lib
 
 Para rodar o projeto:
 
